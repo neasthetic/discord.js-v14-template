@@ -1,4 +1,3 @@
-require('colors');
 const { ActivityType } = require('discord.js');
 const settings = require('./settings.js');
 const Logger = require('./utils/Logger');
@@ -14,9 +13,6 @@ module.exports = client;
     const ConnectDatabase = require('./loaders/load-database'); 
     await ConnectDatabase();
 
-    require('./utils/ExportsRegistry').initExportsGlobal();
-
-    client.removeAllListeners('interactionCreate');
     require('./loaders/load-modules')(client);
     require('./handler/onInteraction')(client);
     require('./handler/ErrorTreatment.js')(client);

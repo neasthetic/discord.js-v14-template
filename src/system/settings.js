@@ -15,7 +15,6 @@ module.exports = {
     },
 
     ANTI_CRASH: {
-        SEND_WEBHOOK: !!process.env.ERROR_WEBHOOK_URL,
         ERROR_WEBHOOK: process.env.ERROR_WEBHOOK_URL,
         RATE_LIMIT_MS: 5000
     },

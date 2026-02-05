@@ -15,7 +15,6 @@ module.exports = (client, options = {}) => {
     errorWebhook = DEFAULT_ERROR_WEBHOOK,
     ignoreKinds = [],
     rateLimitMs = ANTI_CRASH.RATE_LIMIT_MS || 5000,
-    debug = true,
   } = options;
 
   const logDebug = (...args) => {
@@ -199,9 +198,6 @@ module.exports = (client, options = {}) => {
     const embed = BuildErrorEmbeds(kind, info, ctx, stats);
     await sendWebhook(errorWebhook, { embeds: embed }, "error");
   };
-
-  // API global para report manual.
-  global.reportCrash = (kind, err, origin = "Generic") => handleError(kind, err, origin);
 
   // Intercepta console.error para capturar instancias de Error.
   const originalConsoleError = console.error;

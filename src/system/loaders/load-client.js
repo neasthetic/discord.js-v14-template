@@ -10,8 +10,6 @@ const client = new Client({
 	],
 });
 
-client.setMaxListeners(100);
-
 client.slashCommands = new Collection();
 client.buttons = new Collection();
 client.menus = new Collection();
