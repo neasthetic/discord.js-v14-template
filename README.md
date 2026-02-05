@@ -1,22 +1,32 @@
-# DiscordBOT (Base)
+# discord.js V14 (template)
+![Logo](https://camo.githubusercontent.com/8a7f16bf86abeefdd6d264102673110ab28b2024bddd3824ab2621343fb6492f/68747470733a2f2f646973636f72642e6a732e6f72672f7374617469632f6c6f676f2e737667)
 
-Base modular para bots em Discord.js v14, criada para manter uma estrutura sólida de produção para múltiplos bots usando a mesma base. A proposta é permitir adicionar/remover módulos rapidamente, sem afetar o funcionamento geral do bot.
+Esse é um template modular para bots em Discord.js v14, montei com o propósito de manter uma estrutura sólida de produção para múltiplos diferentes bots usando a mesma base. A proposta é permitir adicionar/remover módulos rapidamente, sem afetar o funcionamento geral do bot.
 
-Inclui um sistema de anticrash completo com descritivo do problema para reduzir falhas críticas que desliguem o bot, além de manter estabilidade em produção.
+## Por que usar uma base modular?
+- **Escalabilidade**: A modularidade permite que novos recursos sejam adicionados ao bot sem a necessidade de alterar o código existente. Isso reduz o risco de introduzir bugs e facilita a manutenção do projeto.
+- **Reutilização de código**: Módulos podem ser reutilizados em diferentes projetos, economizando tempo e esforço no desenvolvimento de novos bots.
+- **Colaboração**: Equipes podem trabalhar em diferentes módulos simultaneamente, sem conflitos, acelerando o desenvolvimento.
+- **Facilidade de depuração**: Como cada módulo é independente, é mais fácil identificar e corrigir problemas em partes específicas do código.
+
+## Sistema de Anticrash
+
+O sistema de anticrash integrado foi projetado para garantir a estabilidade do bot em produção. Ele captura erros críticos e os registra, evitando que o bot seja desligado inesperadamente. Além disso, o sistema de anticrash pode enviar informações detalhadas sobre os erros para um Webhook configurado no arquivo `.env`. Isso permite que os desenvolvedores sejam notificados imediatamente sobre qualquer problema, facilitando a resolução rápida e eficiente.
 
 ## Requisitos
 - Node.js 18+
 - MongoDB (opcional, se DATABASE.ENABLE = true)
 
-## Setup
+## Setup Inicial
 ```bash
 npm install
 ```
 
-Copie `.env.example` para `.env` e preencha as variáveis obrigatórias.
+Copie `.env.example` para `.env` e preencha as variáveis obrigatórias. <br>
+Os packages já inclusos são somentes essenciais, instale os que achar conveniente para seus módulos.
 
 ## Scripts
-- `npm run dev` (nodemon)
+- `npm run dev` (inicializa junto com nodemon)
 - `npm run prod`
 
 ## Estrutura
@@ -39,8 +49,19 @@ src/
 Arquivo principal: [src/system/settings.js](src/system/settings.js)
 
 - `BOT_IDENTITY`: define status e activity.
-- `COMMANDS.TYPE`: `GLOBAL` ou `GUILD`.
+- `COMMANDS.TYPE`: `GLOBAL` ou `GUILD`. (se registrará em todos servidores ou em específicos)
 - `COMMANDS.SERVER_GUILDS`: lista de guilds para registro restrito.
+
+## Como criar um módulo?
+
+Criar um novo módulo é simples e rápido. Basta seguir os passos abaixo:
+
+1. **Crie uma pasta para o módulo** dentro do diretório `src/modules/`.
+2. **Adicione subpastas conforme necessário**:
+   - `commands/`: Para comandos do tipo slash.
+   - `events/`: Para eventos do Discord.
+   - `schemas/`: Para esquemas do banco de dados (opcional).
+   - `scripts/`: Para scripts adicionais que o módulo possa precisar.
 
 ## Comandos (padrão ApplicationCommand)
 ```js
@@ -67,83 +88,3 @@ module.exports = new Event({
    }
 }).toJSON();
 ```
-
-## Registro de comandos
-- `GLOBAL`: propaga para todos os servidores (pode demorar até 1h).
-- `GUILD`: registra somente nos IDs de `COMMANDS.SERVER_GUILDS`.
-
-## Por que usar uma base modular?
-
-A modularidade é um dos principais pilares desta base. Isso significa que cada funcionalidade do bot pode ser desenvolvida como um módulo independente, contendo seus próprios comandos, eventos, esquemas de banco de dados e scripts. Essa abordagem oferece diversas vantagens:
-
-- **Escalabilidade**: A modularidade permite que novos recursos sejam adicionados ao bot sem a necessidade de alterar o código existente. Isso reduz o risco de introduzir bugs e facilita a manutenção do projeto.
-- **Reutilização de código**: Módulos podem ser reutilizados em diferentes projetos, economizando tempo e esforço no desenvolvimento de novos bots.
-- **Colaboração**: Equipes podem trabalhar em diferentes módulos simultaneamente, sem conflitos, acelerando o desenvolvimento.
-- **Facilidade de depuração**: Como cada módulo é independente, é mais fácil identificar e corrigir problemas em partes específicas do código.
-
-## Sistema de Anticrash
-
-O sistema de anticrash integrado foi projetado para garantir a estabilidade do bot em produção. Ele captura erros críticos e os registra, evitando que o bot seja desligado inesperadamente. Além disso, o sistema de anticrash pode enviar informações detalhadas sobre os erros para um Webhook configurado no arquivo `.env`. Isso permite que os desenvolvedores sejam notificados imediatamente sobre qualquer problema, facilitando a resolução rápida e eficiente.
-
-### Configuração do Webhook
-No arquivo `.env`, configure a URL do Webhook para receber notificações de erros:
-
-```
-WEBHOOK_URL=https://seu-webhook-url
-```
-
-Quando um erro crítico ocorre, o sistema de anticrash envia uma mensagem para o Webhook com detalhes como:
-- Tipo de erro
-- Mensagem de erro
-- Stack trace
-- Data e hora do erro
-
-## Como criar um módulo?
-
-Criar um novo módulo é simples e rápido. Basta seguir os passos abaixo:
-
-1. **Crie uma pasta para o módulo** dentro do diretório `src/modules/`.
-2. **Adicione subpastas conforme necessário**:
-   - `commands/`: Para comandos do tipo slash.
-   - `events/`: Para eventos do Discord.
-   - `schemas/`: Para esquemas do banco de dados (opcional).
-   - `scripts/`: Para scripts adicionais que o módulo possa precisar.
-3. **Implemente os comandos e eventos** usando as classes `ApplicationCommand` e `Event` disponíveis em `src/system/structures/`.
-4. **Exemplo de comando**:
-
-```js
-const ApplicationCommand = require('../../system/structures/ApplicationCommand');
-
-module.exports = new ApplicationCommand({
-   command: {
-      name: 'exemplo',
-      description: 'Este é um comando de exemplo',
-   },
-   run: async (_client, interaction) => {
-      interaction.reply('Este é um exemplo de comando!');
-   }
-}).toJSON();
-```
-
-5. **Exemplo de evento**:
-
-```js
-const Event = require('../../system/structures/Event');
-
-module.exports = new Event({
-   event: 'messageCreate',
-   run: (_client, message) => {
-      if (message.content === '!ping') {
-         message.reply('Pong!');
-      }
-   }
-}).toJSON();
-```
-
-6. **Teste o módulo** executando o bot em modo de desenvolvimento:
-
-```bash
-npm run dev
-```
-
-7. **Adicione o módulo ao controle de versão** para compartilhá-lo com sua equipe ou reutilizá-lo em outros projetos.
