@@ -40,7 +40,7 @@ async function LoadSchemas(basePath, db, isLocal) {
            // Logger.warn(`[SCHEMA] Arquivo ignorado (sem método válido): ${file}`);
         }
       } catch (err) {
-        Logger.failed(`[SCHEMA] Erro ao carregar ${file}: ${err.message}`);
+        Logger.error(`[SCHEMA] Erro ao carregar ${file}: ${err.message}`);
         process.exit(1);
       }
     }
@@ -55,7 +55,7 @@ async function ConnectDatabase() {
 
       const mongoUri = config.MONGODB_URI || config.MONGO_URI;
       if (!mongoUri) {
-        Logger.failed('[DATABASE) Nenhuma URI encontrada em MONGODB_URI no .env');
+        Logger.error('[DATABASE) Nenhuma URI encontrada em MONGODB_URI no .env');
         process.exit(1);
       }
 
@@ -77,7 +77,7 @@ async function ConnectDatabase() {
       return mongoose;
 
     } catch (err) {
-      Logger.failed(`(DATABASE) Falha crítica ao conectar: ${err.message}`);
+      Logger.error(`(DATABASE) Falha crítica ao conectar: ${err.message}`);
       process.exit(1);
     }
   } else {

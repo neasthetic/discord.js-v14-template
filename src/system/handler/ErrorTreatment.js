@@ -199,15 +199,23 @@ module.exports = (client, options = {}) => {
     await sendWebhook(errorWebhook, { embeds: embed }, "error");
   };
 
-  // Intercepta console.error para capturar instancias de Error.
-  const originalConsoleError = console.error;
+  // Substitui console.error para padronizar no Logger e evitar webhook.
   console.error = (...args) => {
-    originalConsoleError(...args);
-    for (const arg of args) {
-      if (arg instanceof Error) {
-        handleError("Console Error", arg, "console.error");
-      }
-    }
+    const formatted = args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          return arg.stack || `${arg.name}: ${arg.message}`;
+        }
+        if (typeof arg === "string") return arg;
+        try {
+          return JSON.stringify(arg);
+        } catch (e) {
+          return String(arg);
+        }
+      })
+      .join(" ");
+
+    Logger.error(formatted);
   };
 
   // Listeners globais de erro (Node + Discord client).

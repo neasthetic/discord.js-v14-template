@@ -58,7 +58,7 @@ module.exports = client;
     });
 
     await client.login(config.BOT_TOKEN).catch(err => {
-        Logger.failed(`Erro ao conectar o bot: ${err.message}`);
+        Logger.error(`Erro ao conectar o bot: ${err.message}`);
         Logger.warn(`Verifique se o BOT_TOKEN está correto no arquivo .env`);
         process.exit(1);
     });

@@ -51,12 +51,12 @@ const registerSlashCommands = async (client, commands, context = '') => {
         await guild.commands.set(commands).then(() => {
             Logger.success(`(SLASH) Sincronizado em: ${guild.name} (${guild.id})`);
         }).catch(err => {
-            Logger.failed(`(SLASH) Falha em ${guild.id}: ${err.message}`);
+            Logger.error(`(SLASH) Falha em ${guild.id}: ${err.message}`);
         });
     }
 
   } catch (err) {
-    Logger.failed(`(SLASH) Erro fatal no registro de comandos: ${err.message}`);
+    Logger.error(`(SLASH) Erro fatal no registro de comandos: ${err.message}`);
   }
 };
 
@@ -110,7 +110,7 @@ function LoadCommands(client, commandsPath, moduleName) {
       client.slashCommands.set(meta.name, cmd);
       count++;
     } catch (err) {
-      Logger.failed(`[${moduleName}] Erro ao carregar comando ${file}: ${err.message}`);
+      Logger.error(`[${moduleName}] Erro ao carregar comando ${file}: ${err.message}`);
     }
   }
   return count;
@@ -157,7 +157,7 @@ function LoadEvents(client, eventsPath, moduleName) {
 
       count++;
     } catch (err) {
-      Logger.failed(`[${moduleName}] Erro ao carregar evento ${file}: ${err.message}`);
+      Logger.error(`[${moduleName}] Erro ao carregar evento ${file}: ${err.message}`);
     }
   }
   return count;
