@@ -11,6 +11,8 @@ module.exports = {
 
     COMMANDS: {
         TYPE: 'GUILD', // GLOBAL: todos os servidores | GUILD: apenas SERVER_GUILDS
+        PREFIX_COMMANDS_ENABLED: false,
+        PREFIX: '!',
         SERVER_GUILDS: ["1347009131269328907"],
     },
 

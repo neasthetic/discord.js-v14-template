@@ -1,9 +1,12 @@
 const { ActivityType } = require('discord.js');
 const settings = require('./settings.js');
 const Logger = require('./utils/Logger');
+const emojis = require('./utils/Emojis');
 const config = require('./loaders/load-env'); 
 
 const client = require('./loaders/load-client'); 
+client.emojis = emojis;
+global.emojis = emojis;
 module.exports = client;
 
 (async () => {
@@ -15,6 +18,9 @@ module.exports = client;
 
     require('./loaders/load-modules')(client);
     require('./handler/onInteraction')(client);
+        if (settings?.COMMANDS?.PREFIX_COMMANDS_ENABLED) {
+            require('./handler/onPrefixCommand')(client);
+        }
     require('./handler/ErrorTreatment.js')(client);
 
     client.once('clientReady', () => {

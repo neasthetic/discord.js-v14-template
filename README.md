@@ -35,11 +35,13 @@ src/
    system/
       loaders/        # Boot e carregamento de módulos
       handler/        # Eventos globais (interaction, erros)
-      structures/     # Classes base (ApplicationCommand, Event)
+      structures/     # Classes base (ApplicationCommand, PrefixCommand, Event)
       utils/          # Helpers (Logger, Response, etc.)
+      resources/      # Arquivos de recursos (emojis, jsons, etc.)
    modules/
       <Modulo>/
          commands/     # Slash commands
+         prefix/       # Comandos por prefixo
          events/       # Eventos do Discord
          schemas/      # Mongoose schemas
          scripts/      # Scripts opcionais
@@ -50,7 +52,32 @@ Arquivo principal: [src/system/settings.js](src/system/settings.js)
 
 - `BOT_IDENTITY`: define status e activity.
 - `COMMANDS.TYPE`: `GLOBAL` ou `GUILD`. (se registrará em todos servidores ou em específicos)
+- `COMMANDS.PREFIX_COMMANDS_ENABLED`: habilita/desabilita comandos por prefixo.
+- `COMMANDS.PREFIX`: prefixo usado para comandos por mensagem (ex: `!`).
 - `COMMANDS.SERVER_GUILDS`: lista de guilds para registro restrito.
+
+## Util de Emojis
+
+O projeto expõe automaticamente `emojis` no escopo global e em `client.emojis`.
+
+Exemplos de uso:
+
+```js
+// Mensagem/Embed (retorna string de emoji pronta: <:nome:id>)
+await interaction.reply({ content: `${emojis.facebook} Siga nossa página!` });
+
+const embed = new EmbedBuilder()
+   .setDescription(`${emojis.info} Informações do sistema`);
+
+// Botão (retorna objeto compatível com setEmoji)
+const button = new ButtonBuilder()
+   .setCustomId('social-facebook')
+   .setLabel('Facebook')
+   .setEmoji(emojis.button.facebook);
+
+// URL original do emojis.json
+const iconUrl = emojis.url.facebook;
+```
 
 ## Como criar um módulo?
 
@@ -73,6 +100,17 @@ module.exports = new ApplicationCommand({
       description: 'Pong',
    },
    run: async (_client, interaction) => interaction.reply('Pong!')
+}).toJSON();
+```
+
+## Comandos por Prefixo (padrão PrefixCommand)
+```js
+const PrefixCommand = require('../../system/structures/PrefixCommand');
+
+module.exports = new PrefixCommand({
+   name: 'ping',
+   aliases: ['p'],
+   run: async (_client, message) => message.reply('Pong!')
 }).toJSON();
 ```
 

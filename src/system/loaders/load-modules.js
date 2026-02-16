@@ -3,6 +3,7 @@ const path = require('path');
 const settings = require('../settings.js');
 const Logger = require('../utils/Logger');
 const ApplicationCommand = require('../structures/ApplicationCommand');
+const PrefixCommand = require('../structures/PrefixCommand');
 const Event = require('../structures/Event');
 
 
@@ -116,6 +117,55 @@ function LoadCommands(client, commandsPath, moduleName) {
   return count;
 }
 
+function LoadPrefixCommands(client, commandsPath, moduleName) {
+  let count = 0;
+  if (!fs.existsSync(commandsPath)) return count;
+
+  const files = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
+  for (const file of files) {
+    const filePath = path.resolve(commandsPath, file);
+    try {
+      const cmdImport = require(filePath);
+      let cmd = cmdImport;
+
+      if (cmdImport instanceof PrefixCommand) {
+        cmd = cmdImport;
+      } else if (typeof cmdImport === 'function' && cmdImport.prototype instanceof PrefixCommand) {
+        cmd = new cmdImport();
+      }
+
+      const meta = cmd?.command || cmd;
+      const commandName = String(meta?.name || '').trim().toLowerCase();
+      const run = meta?.run;
+
+      if (!commandName || typeof run !== 'function') {
+        Logger.warn(`[${moduleName}] Prefix command inválido em ${file}: precisa de name e run.`);
+        continue;
+      }
+
+      const normalizedCommand = {
+        ...meta,
+        name: commandName,
+        aliases: Array.isArray(meta.aliases)
+          ? meta.aliases.map(alias => String(alias).trim().toLowerCase()).filter(Boolean)
+          : [],
+      };
+
+      client.prefixCommands.set(commandName, normalizedCommand);
+
+      for (const alias of normalizedCommand.aliases) {
+        client.prefixAliases.set(alias, commandName);
+      }
+
+      count++;
+    } catch (err) {
+      Logger.error(`[${moduleName}] Erro ao carregar prefix command ${file}: ${err.message}`);
+    }
+  }
+
+  return count;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // CARREGAMENTO DE EVENTOS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -209,6 +259,9 @@ function loadScripts(client, scriptsPath, moduleName) {
 // ---------------------------------------------------------------------------------------------------------------------
 module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) => {
   if (!client.slashCommands) client.slashCommands = new Map();
+  if (!client.prefixCommands) client.prefixCommands = new Map();
+  if (!client.prefixAliases) client.prefixAliases = new Map();
+  const prefixCommandsEnabled = Boolean(settings?.COMMANDS?.PREFIX_COMMANDS_ENABLED);
 
   client.syncSlashCommands = (reason = 'manual') => {
     const commands = Array.from(client.slashCommands?.values?.() || [])
@@ -230,7 +283,7 @@ module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) =>
   }
 
   const perModuleSummary = [];
-  let totalCmds = 0, totalEvents = 0, totalScripts = 0;
+  let totalCmds = 0, totalPrefixCmds = 0, totalEvents = 0, totalScripts = 0;
 
   // -------------------------------------------------------------------------------------------------------------------
   // CARREGAMENTO DOS MÓDULOS
@@ -243,14 +296,21 @@ module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) =>
     const base = path.join(modulesPath, moduleName);
 
     const moduleCmds = LoadCommands(client, path.join(base, 'commands'), moduleName);
+    const modulePrefixCmds = prefixCommandsEnabled
+      ? (
+        LoadPrefixCommands(client, path.join(base, 'prefix'), moduleName) +
+        LoadPrefixCommands(client, path.join(base, 'prefixCommands'), moduleName)
+      )
+      : 0;
     const moduleEvents = LoadEvents(client, path.join(base, 'events'), moduleName);
     const moduleScripts = loadScripts(client, path.join(base, 'scripts'), moduleName);
 
     totalCmds += moduleCmds;
+    totalPrefixCmds += modulePrefixCmds;
     totalEvents += moduleEvents;
     totalScripts += moduleScripts;
 
-    perModuleSummary.push({ moduleName, moduleCmds, moduleEvents, moduleScripts });
+    perModuleSummary.push({ moduleName, moduleCmds, modulePrefixCmds, moduleEvents, moduleScripts });
   }
 
   console.log(`\n${'[MÓDULOS]'.green.bold} Carregamento concluído em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`);
@@ -261,6 +321,7 @@ module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) =>
     console.log(
       ` ${String(modulesNumberList++).white}. ${m.moduleName.white}: ` +
       `${Plural(m.moduleCmds, 'comando', 'comandos').gray.bold}, ` +
+      `${Plural(m.modulePrefixCmds, 'prefix', 'prefixes').gray.bold}, ` +
       `${Plural(m.moduleEvents, 'evento', 'eventos').gray.bold}, ` +
       `${Plural(m.moduleScripts, 'script', 'scripts').gray.bold}`
     );
@@ -269,6 +330,7 @@ module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) =>
   console.log(
     ` ${'TOTAL:'.cyan.bold} ` +
     `${Plural(totalCmds, 'comando', 'comandos')}, ` +
+    `${Plural(totalPrefixCmds, 'prefix', 'prefixes')}, ` +
     `${Plural(totalEvents, 'evento', 'eventos')}, ` +
     `${Plural(totalScripts, 'script', 'scripts')}\n`
   );
@@ -281,6 +343,8 @@ module.exports = (client, modulesPath = DEFAULT_MODULES_PATH, reload = false) =>
       if (key.includes(modulesPath)) delete require.cache[key];
     });
     client.slashCommands.clear();
+    client.prefixCommands.clear();
+    client.prefixAliases.clear();
     client.__modulesLoaded = false;
     module.exports(client, modulesPath, true);
   };
