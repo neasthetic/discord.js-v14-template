@@ -9,9 +9,9 @@ module.exports = new ApplicationCommand({
   },
 
   run: async (client, interaction) => {
-    const emojis = client.emojis || global.emojis;
+    const appemoji = client.appemoji || global.appemoji;
     await interaction.reply({
-      content: `${emojis.success || '👋'} Olá, ${interaction.user}! Esse é um comando slash de exemplo.`,
+      content: `${appemoji.success || '👋'} Olá, ${interaction.user}! Esse é um comando slash de exemplo.`,
     });
   },
 }).toJSON();

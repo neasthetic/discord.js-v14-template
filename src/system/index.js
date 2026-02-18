@@ -1,12 +1,12 @@
 const { ActivityType } = require('discord.js');
 const settings = require('./settings.js');
 const Logger = require('./utils/Logger');
-const emojis = require('./utils/Emojis');
+const appemoji = require('./utils/Emojis');
 const config = require('./loaders/load-env'); 
 
 const client = require('./loaders/load-client'); 
-client.emojis = emojis;
-global.emojis = emojis;
+client.appemoji = appemoji;
+global.appemoji = appemoji;
 module.exports = client;
 
 (async () => {
@@ -23,9 +23,29 @@ module.exports = client;
         }
     require('./handler/ErrorTreatment.js')(client);
 
-    client.once('clientReady', () => {
+        client.once('clientReady', async () => {
       const botName = `${client.user.tag}`.yellow.bold;
       Logger.success(`Autenticado e conectado como ${botName}`)
+
+            const emojiSyncSettings = settings.APP_EMOJI_SYNC || {};
+            const shouldSync = emojiSyncSettings.ENABLED !== false;
+
+            if (shouldSync) {
+                const syncResult = await appemoji.sync(client, {
+                    logger: Logger,
+                    delayMs: Number(emojiSyncSettings.CREATE_DELAY_MS ?? 1200),
+                    skipIfUnchanged: emojiSyncSettings.SKIP_IF_UNCHANGED !== false,
+                    cooldownMs: Number(emojiSyncSettings.CHECK_COOLDOWN_MINUTES ?? 60) * 60 * 1000,
+                });
+
+                if (syncResult.fromCache) {
+                    Logger.info('App emojis carregados do cache local (sem nova verificação na API).');
+                } else {
+                    Logger.info(`App emojis sincronizados: existentes=${syncResult.existing}, criados=${syncResult.created}, falhas=${syncResult.failed}, ignorados=${syncResult.skipped}`);
+                }
+            } else {
+                Logger.info('Sincronização de app emojis desativada em settings.APP_EMOJI_SYNC.ENABLED.');
+            }
       
       const { ACTIVITY_TYPE, ACTIVITY_NAME, ACTIVITY_URL, STATUS } = settings.BOT_IDENTITY;
 

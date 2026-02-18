@@ -1,3 +1,5 @@
+const isDevMode = String(process.env.DEV_MODE || '').toLowerCase() === 'true';
+
 module.exports = {
     
     USE_DATABASE: true, // Requer MONGODB_URI no .env
@@ -14,6 +16,13 @@ module.exports = {
         PREFIX_COMMANDS_ENABLED: false,
         PREFIX: '!',
         SERVER_GUILDS: ["1347009131269328907"],
+    },
+
+    APP_EMOJI_SYNC: {
+        ENABLED: true,
+        CREATE_DELAY_MS: isDevMode ? 400 : 1200,
+        SKIP_IF_UNCHANGED: true,
+        CHECK_COOLDOWN_MINUTES: isDevMode ? 5 : 360,
     },
 
     ANTI_CRASH: {

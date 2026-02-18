@@ -55,28 +55,40 @@ Arquivo principal: [src/system/settings.js](src/system/settings.js)
 - `COMMANDS.PREFIX_COMMANDS_ENABLED`: habilita/desabilita comandos por prefixo.
 - `COMMANDS.PREFIX`: prefixo usado para comandos por mensagem (ex: `!`).
 - `COMMANDS.SERVER_GUILDS`: lista de guilds para registro restrito.
+- `APP_EMOJI_SYNC`: configura sincronização de emojis da aplicação.
 
 ## Util de Emojis
 
-O projeto expõe automaticamente `emojis` no escopo global e em `client.emojis`.
+Ao iniciar o bot, o sistema sincroniza automaticamente os emojis definidos em `src/system/resources/emojis.json` usando a API de **Application Emojis** (`client.application.emojis`).
+
+O acesso principal fica em `appemoji` (global) e `client.appemoji`.
+
+Para otimização, o sistema usa cache local em `src/system/resources/.appemoji-sync-cache.json` e pode pular a consulta na API se o arquivo `emojis.json` não mudou e o cooldown não expirou.
+
+Configurações disponíveis em `settings.APP_EMOJI_SYNC`:
+
+- `ENABLED`: ativa/desativa o sync no startup.
+- `CREATE_DELAY_MS`: delay entre criações para evitar rate limit.
+- `SKIP_IF_UNCHANGED`: pula sync se já existe cache válido.
+- `CHECK_COOLDOWN_MINUTES`: tempo mínimo para nova verificação na API.
 
 Exemplos de uso:
 
 ```js
-// Mensagem/Embed (retorna string de emoji pronta: <:nome:id>)
-await interaction.reply({ content: `${emojis.facebook} Siga nossa página!` });
+// Mensagem/Embed (retorna string pronta: <:nome:id>)
+await interaction.reply({ content: `${appemoji.facebook} Siga nossa página!` });
 
 const embed = new EmbedBuilder()
-   .setDescription(`${emojis.info} Informações do sistema`);
+   .setDescription(`${appemoji.info} Informações do sistema`);
 
 // Botão (retorna objeto compatível com setEmoji)
 const button = new ButtonBuilder()
    .setCustomId('social-facebook')
    .setLabel('Facebook')
-   .setEmoji(emojis.button.facebook);
+   .setEmoji(appemoji.button.facebook);
 
-// URL original do emojis.json
-const iconUrl = emojis.url.facebook;
+// Valor bruto armazenado (mention sincronizada ou URL fallback)
+const iconUrl = appemoji.url.facebook;
 ```
 
 ## Como criar um módulo?

@@ -5,7 +5,7 @@ module.exports = new PrefixCommand({
   aliases: ['oi', 'ola'],
   description: 'Comando prefixado simples de exemplo.',
   run: async (client, message) => {
-    const emojis = client.emojis || global.emojis;
-    await message.reply(`${emojis.success || '✅'} Olá, ${message.author}! Esse é um comando por prefixo.`);
+    const appemoji = client.appemoji || global.appemoji;
+    await message.reply(`${appemoji.success || '✅'} Olá, ${message.author}! Esse é um comando por prefixo.`);
   },
 }).toJSON();
