@@ -2,11 +2,17 @@ const { ActivityType } = require('discord.js');
 const settings = require('./settings.js');
 const Logger = require('./utils/Logger');
 const appemoji = require('./utils/Emojis');
+const componentsV2 = require('./utils/ComponentsV2');
+const modalV2 = require('./utils/ModalV2');
 const config = require('./loaders/load-env'); 
 
 const client = require('./loaders/load-client'); 
 client.appemoji = appemoji;
+client.componentsV2 = componentsV2;
+client.modalV2 = modalV2;
 global.appemoji = appemoji;
+global.componentsV2 = componentsV2;
+global.modalV2 = modalV2;
 module.exports = client;
 
 (async () => {
@@ -27,25 +33,25 @@ module.exports = client;
       const botName = `${client.user.tag}`.yellow.bold;
       Logger.success(`Autenticado e conectado como ${botName}`)
 
-            const emojiSyncSettings = settings.APP_EMOJI_SYNC || {};
-            const shouldSync = emojiSyncSettings.ENABLED !== false;
+        // const emojiSyncSettings = settings.APP_EMOJI_SYNC || {};
+        // const shouldSync = emojiSyncSettings.RUN_ON_STARTUP === true;
 
-            if (shouldSync) {
-                const syncResult = await appemoji.sync(client, {
-                    logger: Logger,
-                    delayMs: Number(emojiSyncSettings.CREATE_DELAY_MS ?? 1200),
-                    skipIfUnchanged: emojiSyncSettings.SKIP_IF_UNCHANGED !== false,
-                    cooldownMs: Number(emojiSyncSettings.CHECK_COOLDOWN_MINUTES ?? 60) * 60 * 1000,
-                });
+        // if (shouldSync) {
+        //     const syncResult = await appemoji.sync(client, {
+        //         logger: Logger,
+        //         delayMs: Number(emojiSyncSettings.CREATE_DELAY_MS ?? 1200),
+        //         skipIfUnchanged: emojiSyncSettings.SKIP_IF_UNCHANGED !== false,
+        //         cooldownMs: Number(emojiSyncSettings.CHECK_COOLDOWN_MINUTES ?? 60) * 60 * 1000,
+        //     });
 
-                if (syncResult.fromCache) {
-                    Logger.info('App emojis carregados do cache local (sem nova verificação na API).');
-                } else {
-                    Logger.info(`App emojis sincronizados: existentes=${syncResult.existing}, criados=${syncResult.created}, falhas=${syncResult.failed}, ignorados=${syncResult.skipped}`);
-                }
-            } else {
-                Logger.info('Sincronização de app emojis desativada em settings.APP_EMOJI_SYNC.ENABLED.');
-            }
+        //     if (syncResult.fromCache) {
+        //         Logger.info('App emojis carregados do cache local (sem nova verificação na API).');
+        //     } else {
+        //         Logger.info(`App emojis sincronizados: existentes=${syncResult.existing}, criados=${syncResult.created}, falhas=${syncResult.failed}, ignorados=${syncResult.skipped}`);
+        //     }
+        // } else {
+        //     Logger.info('Sync automático de app emojis desativado. Use o comando "npm run emojis:install" no console para sincronizar manualmente.');
+        // }
       
       const { ACTIVITY_TYPE, ACTIVITY_NAME, ACTIVITY_URL, STATUS } = settings.BOT_IDENTITY;
 

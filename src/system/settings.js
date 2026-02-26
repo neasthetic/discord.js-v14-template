@@ -15,11 +15,11 @@ module.exports = {
         TYPE: 'GUILD', // GLOBAL: todos os servidores | GUILD: apenas SERVER_GUILDS
         PREFIX_COMMANDS_ENABLED: false,
         PREFIX: '!',
-        SERVER_GUILDS: ["1347009131269328907"],
+        SERVER_GUILDS: ["1476329401279971378"],
     },
 
     APP_EMOJI_SYNC: {
-        ENABLED: true,
+        RUN_ON_STARTUP: false,
         CREATE_DELAY_MS: isDevMode ? 400 : 1200,
         SKIP_IF_UNCHANGED: true,
         CHECK_COOLDOWN_MINUTES: isDevMode ? 5 : 360,

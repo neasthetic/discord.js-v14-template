@@ -1,4 +1,5 @@
 const { MessageFlags } = require("discord.js");
+const Logger = require('../utils/Logger');
 
 module.exports = (client) => {
   client.on("interactionCreate", async (interaction) => {
