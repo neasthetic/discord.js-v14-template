@@ -2,8 +2,7 @@
   "scripts": {
     "start": "node src/system/index.js",
     "dev": "set DEV_MODE=true && nodemon src/system/index.js",
-    "prod": "node src/system/index.js",
-    "emojis:install": "node src/system/cli/install-emojis.js"
+    "prod": "node src/system/index.js"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

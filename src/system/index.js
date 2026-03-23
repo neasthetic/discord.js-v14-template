@@ -1,17 +1,14 @@
 const { ActivityType } = require("discord.js");
 const settings = require("./settings.js");
 const Logger = require("./utils/Logger");
-const appemoji = require("./utils/Emojis");
 const componentsV2 = require("./utils/ComponentsV2");
 const modalV2 = require("./utils/ModalV2");
 const config = require("./loaders/load-env");
 
 const client = require("./loaders/load-client");
 const ConnectDatabase = require("./loaders/load-database");
-client.appemoji = appemoji;
 client.componentsV2 = componentsV2;
 client.modalV2 = modalV2;
-global.appemoji = appemoji;
 global.componentsV2 = componentsV2;
 global.modalV2 = modalV2;
 module.exports = client;

@@ -19,7 +19,6 @@ Os packages já inclusos são somentes essenciais, instale os que achar convenie
 
 - `npm run dev` (inicializa junto com nodemon)
 - `npm run prod`
-- `npm run emojis:install` (sincroniza app emojis pelo console e encerra)
 
 
 
@@ -31,7 +30,6 @@ src/
       handler/        # Eventos globais (interaction, erros)
       structures/     # Classes base (ApplicationCommand, PrefixCommand, Event)
       utils/          # Helpers (Logger, Response, etc.)
-      resources/      # Arquivos de recursos (emojis, jsons, etc.)
    modules/
       <Modulo>/
          commands/     # Slash commands
@@ -49,58 +47,6 @@ Arquivo principal: [src/system/settings.js](src/system/settings.js)
 - `COMMANDS.PREFIX_COMMANDS_ENABLED`: habilita/desabilita comandos por prefixo.
 - `COMMANDS.PREFIX`: prefixo usado para comandos por mensagem (ex: `!`).
 - `COMMANDS.SERVER_GUILDS`: lista de guilds para registro restrito.
-- `APP_EMOJI_SYNC`: configura sincronização de emojis da aplicação.
-
-## Util de Emojis
-
-O sistema utiliza os emojis definidos em `src/system/resources/emojis.json` e a sincronização é feita via **console**. <br> Ele registra DIRETAMENTE na aplicação os emojis do JSON, ou seja, sem necessidade de que sejam colocados em algum servidor para que possam ser utilizados.
-
-- Para instalar/sincronizar os emojis manualmente, execute:
-
-```bash
-npm run emojis:install
-```
-
-Para forçar atualização ignorando cache/cooldown, execute:
-
-```bash
-npm run emojis:install -- --force
-```
-Com isso, o sistema:
-   - faz login com o `BOT_TOKEN` do `.env`;
-   - sincroniza os emojis na aplicação;
-   - mostra resumo no terminal (`existentes`, `criados`, `falhas`, `ignorados`);
-   - encerra o processo automaticamente.
-
-O acesso principal fica em `appemoji` (global) e `client.appemoji`.
-
-Para otimização, o sistema usa cache local em `src/system/resources/.appemoji-sync-cache.json` e pode pular a consulta na API se o arquivo `emojis.json` não mudou e o cooldown não expirou.
-
-Configurações disponíveis em `settings.APP_EMOJI_SYNC`:
-
-- `RUN_ON_STARTUP`: se `true`, sincroniza automaticamente no startup (padrão `false`).
-- `CREATE_DELAY_MS`: delay entre criações para evitar rate limit.
-- `SKIP_IF_UNCHANGED`: pula sync se já existe cache válido.
-- `CHECK_COOLDOWN_MINUTES`: tempo mínimo para nova verificação na API.
-
-Exemplos de uso:
-
-```js
-// Mensagem/Embed (retorna string pronta: <:nome:id>)
-await interaction.reply({ content: `${appemoji.facebook} Siga nossa página!` });
-
-const embed = new EmbedBuilder()
-   .setDescription(`${appemoji.info} Informações do sistema`);
-
-// Botão (retorna objeto compatível com setEmoji)
-const button = new ButtonBuilder()
-   .setCustomId('social-facebook')
-   .setLabel('Facebook')
-   .setEmoji(appemoji.button.facebook);
-
-// Valor bruto armazenado (mention sincronizada ou URL fallback)
-const iconUrl = appemoji.url.facebook;
-```
 
 ## Util ComponentsV2 & Modals
 

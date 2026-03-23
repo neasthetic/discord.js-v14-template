@@ -18,13 +18,6 @@ module.exports = {
         SERVER_GUILDS: ["1476329401279971378"],
     },
 
-    APP_EMOJI_SYNC: {
-        RUN_ON_STARTUP: false,
-        CREATE_DELAY_MS: isDevMode ? 400 : 1200,
-        SKIP_IF_UNCHANGED: true,
-        CHECK_COOLDOWN_MINUTES: isDevMode ? 5 : 360,
-    },
-
     ANTI_CRASH: {
         ERROR_WEBHOOK: process.env.ERROR_WEBHOOK_URL,
         RATE_LIMIT_MS: 5000
