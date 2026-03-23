@@ -5,16 +5,13 @@
     "prod": "node src/system/index.js",
     "emojis:install": "node src/system/cli/install-emojis.js"
   },
-
   "devDependencies": {
     "nodemon": "^3.1.11"
   },
-
   "dependencies": {
-    "colors": "latest",
+    "colors": "^1.4.0",
     "discord.js": "^14.25.1",
     "dotenv": "^16.6.1",
     "mongoose": "^8.19.1"
   }
-  
 }

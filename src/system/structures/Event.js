@@ -4,7 +4,6 @@ class Event {
    */
   constructor(structure) {
     this.data = {
-      __type__: 5,
       once: false,
       ...structure,
     };

@@ -1,4 +1,4 @@
-const { ApplicationCommandType } = require('discord.js');
+const { ApplicationCommandType } = require("discord.js");
 
 class ApplicationCommand {
   /**
@@ -8,7 +8,7 @@ class ApplicationCommand {
    * @param {Function} [options.autocomplete] - Autocomplete (opcional)
    */
   constructor(options = {}) {
-    if (!options.command || typeof options.command !== 'object') {
+    if (!options.command || typeof options.command !== "object") {
       throw new Error('ApplicationCommand precisa de um objeto "command".');
     }
 
@@ -18,11 +18,6 @@ class ApplicationCommand {
       type: ApplicationCommandType.ChatInput,
       ...command,
     };
-
-    this.name = this.command.name;
-    this.description = this.command.description;
-    this.type = this.command.type;
-    this.options = this.command.options || [];
 
     this.run = run;
     this.autocomplete = autocomplete;

@@ -1,5 +1,5 @@
 const { MessageFlags } = require("discord.js");
-const Logger = require('../utils/Logger');
+const Logger = require("../utils/Logger");
 
 module.exports = (client) => {
   client.on("interactionCreate", async (interaction) => {
@@ -10,7 +10,7 @@ module.exports = (client) => {
         await handleSlash(client, interaction);
       } else if (interaction.isButton()) {
         await handleComponent(client.buttons, "[BUTTON]", interaction);
-      } else if (interaction.isStringSelectMenu()) {
+      } else if (interaction.isAnySelectMenu()) {
         await handleComponent(client.menus, "[MENU]", interaction);
       } else if (interaction.isModalSubmit()) {
         await handleComponent(client.modals, "[MODAL]", interaction);
@@ -50,7 +50,9 @@ const handleComponent = async (registry, label, interaction) => {
 
   // Se não encontrar, tenta encontrar por prefixo (ex: "ticket-close_123" -> handler "ticket-close")
   if (!handler) {
-    handler = registry?.find((cmd, key) => interaction.customId.startsWith(key));
+    handler = registry?.find((cmd, key) =>
+      interaction.customId.startsWith(key),
+    );
   }
 
   if (!handler) return;

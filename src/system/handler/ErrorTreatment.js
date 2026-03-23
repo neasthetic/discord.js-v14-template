@@ -3,8 +3,6 @@ const settings = require("../settings.js");
 const { ANTI_CRASH } = settings;
 const Logger = require("../utils/Logger.js");
 
-require("colors");
-
 const DEFAULT_ERROR_WEBHOOK = ANTI_CRASH.ERROR_WEBHOOK;
 
 const DEDUP_WINDOW_MS = 60_000;
@@ -17,11 +15,6 @@ module.exports = (client, options = {}) => {
     rateLimitMs = ANTI_CRASH.RATE_LIMIT_MS || 5000,
   } = options;
 
-  const logDebug = (...args) => {
-    // Debug opcional para diagnostico do anti-crash.
-
-  };
-
   const dedupCache = new Map();
   const occurrenceStats = new Map();
   const webhookLastSend = new Map();
@@ -30,7 +23,6 @@ module.exports = (client, options = {}) => {
     const now = Date.now();
     for (const [fp, ts] of dedupCache.entries()) {
       if (now - ts > DEDUP_WINDOW_MS * 2) {
-        logDebug("Limpando fingerprint do cache:", fp);
         dedupCache.delete(fp);
       }
     }
@@ -38,7 +30,8 @@ module.exports = (client, options = {}) => {
 
   // Utilitarios internos.
   const nowISO = () => new Date().toISOString();
-  const truncate = (txt, max = 3900) => (txt && txt.length > max ? txt.slice(0, max) + "\n…(truncado)" : txt || "");
+  const truncate = (txt, max = 3900) =>
+    txt && txt.length > max ? txt.slice(0, max) + "\n…(truncado)" : txt || "";
   const plural = (v, s, p) => `${v} ${v === 1 ? s : p}`;
 
   const topFrameFrom = (stack) => {
@@ -69,7 +62,8 @@ module.exports = (client, options = {}) => {
     const parts = [];
     if (days) parts.push(plural(days, "dia", "dias"));
     if (hours || days) parts.push(plural(hours, "hora", "horas"));
-    if (minutes || hours || days) parts.push(plural(minutes, "minuto", "minutos"));
+    if (minutes || hours || days)
+      parts.push(plural(minutes, "minuto", "minutos"));
     parts.push(plural(seconds, "segundo", "segundos"));
 
     return parts.join(", ");
@@ -94,7 +88,9 @@ module.exports = (client, options = {}) => {
   const sendWebhook = async (url, body, label = "generic") => {
     if (!url || typeof url !== "string" || !url.startsWith("https://")) return;
     if (!fetch) {
-      Logger.error('(ANTI-CRASH) fetch não disponível. Use Node 18+ para envio de webhooks.');
+      Logger.error(
+        "(ANTI-CRASH) fetch não disponível. Use Node 18+ para envio de webhooks.",
+      );
       return;
     }
     const now = Date.now();
@@ -117,24 +113,45 @@ module.exports = (client, options = {}) => {
 
       if (![200, 204].includes(res.status)) {
         Logger.warn(`(ANTI-CRASH) Webhook "${label}" respondeu ${res.status}`);
-      } else {
-        logDebug(`(ANTI-CRASH) Webhook "${label}" enviado.`);
       }
     } catch (e) {
-      Logger.error(`(ANTI-CRASH) Falha ao enviar webhook "${label}":`, e?.message || e);
+      Logger.error(
+        `(ANTI-CRASH) Falha ao enviar webhook "${label}":`,
+        e?.message || e,
+      );
     }
   };
 
   // Monta o payload do embed para o webhook.
   const BuildErrorEmbeds = (kind, info, ctx, stats) => {
     const fields = [
-      { name: "Tipo", value: `\`\`\`${kind} (${info.name})\`\`\``, inline: false },
-      { name: "Onde", value: info.topFrame ? `\`\`\`${info.topFrame}\`\`\`` : "(sem stack)", inline: false },
-      { name: "Mensagem", value: `\`\`\`text\n${truncate(info.message || "(sem mensagem)", 500)}\n\`\`\``, inline: false },
-      { name: "Recorrência", value: `\`\`\`${stats.count}x desde ${new Date(stats.first).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}\`\`\``, inline: false },
+      {
+        name: "Tipo",
+        value: `\`\`\`${kind} (${info.name})\`\`\``,
+        inline: false,
+      },
+      {
+        name: "Onde",
+        value: info.topFrame ? `\`\`\`${info.topFrame}\`\`\`` : "(sem stack)",
+        inline: false,
+      },
+      {
+        name: "Mensagem",
+        value: `\`\`\`text\n${truncate(info.message || "(sem mensagem)", 500)}\n\`\`\``,
+        inline: false,
+      },
+      {
+        name: "Recorrência",
+        value: `\`\`\`${stats.count}x desde ${new Date(stats.first).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}\`\`\``,
+        inline: false,
+      },
       { name: "Uptime", value: ctx.uptime, inline: true },
-      ...(ctx.origin ? [{ name: "Origem", value: ctx.origin, inline: true }] : []),
-      ...(ctx.shard !== null ? [{ name: "Shard", value: String(ctx.shard), inline: true }] : []),
+      ...(ctx.origin
+        ? [{ name: "Origem", value: ctx.origin, inline: true }]
+        : []),
+      ...(ctx.shard !== null
+        ? [{ name: "Shard", value: String(ctx.shard), inline: true }]
+        : []),
     ];
 
     return [
@@ -152,14 +169,22 @@ module.exports = (client, options = {}) => {
   const logCrash = (kind, info, origin) => {
     const location = info.topFrame ? ` @ ${info.topFrame}` : "";
     const badge = origin ? `${kind} (${origin})` : kind;
-    Logger.error('\n(ANTI-CRASH)'.red + ` Detectado: ${badge}`);
+    Logger.error("\n(ANTI-CRASH)".red + ` Detectado: ${badge}${location}`);
   };
 
   // Atualiza contadores por fingerprint.
   const registerOccurrence = (fp) => {
     const now = Date.now();
-    const current = occurrenceStats.get(fp) || { count: 0, first: now, last: 0 };
-    const updated = { count: current.count + 1, first: current.first, last: now };
+    const current = occurrenceStats.get(fp) || {
+      count: 0,
+      first: now,
+      last: 0,
+    };
+    const updated = {
+      count: current.count + 1,
+      first: current.first,
+      last: now,
+    };
     occurrenceStats.set(fp, updated);
     return updated;
   };
@@ -175,10 +200,7 @@ module.exports = (client, options = {}) => {
       return false;
     }
 
-    if (now - last < DEDUP_WINDOW_MS) {
-      logDebug(`(ANTI-CRASH) dedup suprimido (fp=${fp}) count=${stats.count}`);
-      return true;
-    }
+    if (now - last < DEDUP_WINDOW_MS) return true;
 
     dedupCache.set(fp, now);
     return false;
@@ -199,28 +221,13 @@ module.exports = (client, options = {}) => {
     await sendWebhook(errorWebhook, { embeds: embed }, "error");
   };
 
-  // Substitui console.error para padronizar no Logger e evitar webhook.
-  console.error = (...args) => {
-    const formatted = args
-      .map((arg) => {
-        if (arg instanceof Error) {
-          return arg.stack || `${arg.name}: ${arg.message}`;
-        }
-        if (typeof arg === "string") return arg;
-        try {
-          return JSON.stringify(arg);
-        } catch (e) {
-          return String(arg);
-        }
-      })
-      .join(" ");
-
-    Logger.error(formatted);
-  };
-
   // Listeners globais de erro (Node + Discord client).
-  process.on("unhandledRejection", (reason) => handleError("Unhandled Rejection", reason));
-  process.on("uncaughtException", (err) => handleError("Uncaught Exception", err));
+  process.on("unhandledRejection", (reason) =>
+    handleError("Unhandled Rejection", reason),
+  );
+  process.on("uncaughtException", (err) =>
+    handleError("Uncaught Exception", err),
+  );
 
   if (client && client.on) {
     client.on("error", (err) => handleError("Client Error", err, "Client"));
