@@ -1,5 +1,5 @@
 # Discord.js v14 — Template modular
-
+![Logo](https://camo.githubusercontent.com/8a7f16bf86abeefdd6d264102673110ab28b2024bddd3824ab2621343fb6492f/68747470733a2f2f646973636f72642e6a732e6f72672f7374617469632f6c6f676f2e737667)
 Base para bots Discord em **TypeScript**, com comandos, eventos e componentes organizados por funcionalidade. Os módulos são carregados automaticamente, sem precisar adicioná-los ao núcleo.
 
 ## Vantagens
