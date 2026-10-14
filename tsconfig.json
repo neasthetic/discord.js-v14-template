@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "ignoreDeprecations": "5.0",
+        "lib": [
+            "esnext"
+        ],
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "rootDir": "./src",
+        "outDir": "./build",
+        "baseUrl": "./src",
+        "paths": {
+            "#*": [
+                "*"
+            ],
+            "#emojis": [
+                "config/emojis.json"
+            ],
+            "#settings": [
+                "config/settings.json"
+            ]
+        }
+    },
+    "include": [
+        "src"
+    ]
+}

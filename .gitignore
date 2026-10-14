@@ -1,3 +1,28 @@
+﻿# Dependências e saída compilada
+node_modules/
+build/
+*.tsbuildinfo
+
+# Variáveis de ambiente e segredos locais
 .env
-node_modules
-package-lock.json
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs e relatórios de testes
+logs/
+*.log
+coverage/
+.nyc_output/
+
+# Arquivos temporários e sistema operacional
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Preferências locais do editor
+.vscode/
+.idea/

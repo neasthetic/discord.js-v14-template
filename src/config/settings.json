@@ -1,0 +1,13 @@
+{
+    "servers": [],
+    "useDatabase": false,
+    "identity": {
+        "type": "Custom",
+        "status": "online",
+        "activities": [
+            "?? Gerenciando [USERS] usu?rios",
+            "?? D?vidas? Abra um ticket!"
+        ],
+        "intervalMs": 10000
+    }
+}
